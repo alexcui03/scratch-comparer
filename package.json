@@ -1,0 +1,19 @@
+{
+  "name": "scratch-comparer",
+  "version": "1.0.0",
+  "description": "A scratch project comparer.",
+  "main": "src/main.ts",
+  "author": "Alex Cui",
+  "license": "AGPL-3.0",
+  "scripts": {
+    "start": "ts-node src/main.ts"
+  },
+  "dependencies": {
+    "adm-zip": "^0.4.16",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.27"
+  }
+}
