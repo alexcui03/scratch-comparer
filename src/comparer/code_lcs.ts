@@ -25,14 +25,15 @@ class LcsCodeComparer extends Comparer {
                     }
                     return false;
                 });
-                console.log(i, j, sim / srcDLR.length, sim / dstDLR.length);
+                //console.log(i, j, sim / srcDLR.length, sim / dstDLR.length);
                 flow.addFlowEdge(i + 10, j + 10 + srcTrees.length, 1, sim / dstDLR.length);
             }
         }
         
-        console.log(flow.mcmf(s, t), flow.getCost());
+        let c = flow.mcmf(s, t);
 
         let res = new CompareResult();
+        res.similarity = flow.getCost() / c;
         return res;
     }
 

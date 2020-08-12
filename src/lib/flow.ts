@@ -72,7 +72,7 @@ class Flow extends Graph<FlowData> {
                 this.edge[e ^ 1].data.weight += this.flow[t];
             }
             res += this.flow[t];
-            console.log('MCMF', res, this.cost);
+            //console.log('MCMF', res, this.cost);
         }
         return res;
     }
