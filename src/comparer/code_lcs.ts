@@ -3,6 +3,21 @@ import Tree from '../lib/tree';
 import Flow from '../lib/flow';
 import Block from '../lib/block';
 
+const stopWords = [
+    'control_forever',
+    'control_repeat',
+    'control_if',
+    'control_if_else',
+    'control_stop',
+    'control_wait',
+    'control_wait_until',
+    'control_repeat_until',
+    'control_while',
+    'control_for_each',
+    'control_start_as_clone',
+    'control_create_clone_of_menu'
+];
+
 class LcsCodeComparer extends Comparer {
     public compare(): CompareResult {
         let srcTrees = this.srcLoader.getSyntaxTrees();
@@ -16,8 +31,18 @@ class LcsCodeComparer extends Comparer {
             let srcDLR = srcTrees[i].orderDLR();
             for (let j = 0; j < dstTrees.length; ++j) {
                 let dstDLR = dstTrees[j].orderDLR();
+                let cnt = 0;
                 let sim = this.lcs<Block>(srcDLR, dstDLR, (a: Block, b: Block): boolean => {
+                    if (stopWords.includes(b.opcode) && b.childCount > 0) {
+                        ++cnt;
+                        return false;
+                    }
                     if (a.opcode === b.opcode) {
+                        if (stopWords.includes(a.parent)) {
+                            if (a.parent !== b.parent) {
+                                return false;
+                            }
+                        }
                         if (a.opcode === '#' || a.opcode === '%') {
                             return a.data === b.data;
                         }
@@ -25,8 +50,9 @@ class LcsCodeComparer extends Comparer {
                     }
                     return false;
                 });
-                //console.log(i, j, sim / srcDLR.length, sim / dstDLR.length);
-                flow.addFlowEdge(i + 10, j + 10 + srcTrees.length, 1, sim / dstDLR.length);
+                //if (cnt > 0) console.log(cnt, srcDLR.length);
+                let len = dstDLR.length - cnt / srcDLR.length;
+                flow.addFlowEdge(i + 10, j + 10 + srcTrees.length, 1, sim / len);
             }
         }
         

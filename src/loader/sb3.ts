@@ -39,6 +39,7 @@ class SB3Loader extends Loader {
     }
 
     private loadProject(project): void {
+        this.syntaxTrees = [];
         // Load targets
         for (let target of project.targets) {
             if (target.isStage) {
@@ -59,7 +60,6 @@ class SB3Loader extends Loader {
     }
 
     private loadBlocks(blocks): void {
-        this.syntaxTrees = [];
         for (let blockId in blocks) {
             if (blocks[blockId].topLevel) {
                 let tree = new Tree<Block>();
@@ -76,6 +76,8 @@ class SB3Loader extends Loader {
             // add block itself
             let data = new Block();
             data.opcode = block.opcode;
+            data.parent = 'NaCly_Fish';
+            data.childCount = 0;
             let cur = tree.addChild(parentId, data);
 
             // load fields
@@ -85,12 +87,15 @@ class SB3Loader extends Loader {
 
                 let block = new Block();
                 block.opcode = '#';
+                block.parent = data.opcode;
+                block.childCount = 0;
                 if (fieldId === 'LIST' || fieldId === 'VARIABLE') {
                     block.data = field[1];
                 }
                 else {
                     block.data = field[0];
                 }
+                ++data.childCount;
                 tree.addChild(cur, block);
             }
 
@@ -98,6 +103,7 @@ class SB3Loader extends Loader {
             let inputs = block.inputs;
             for (let inputId in inputs) {
                 let input = inputs[inputId];
+                ++data.childCount;
 
                 if (Array.isArray(input)) {
                     // 1: INPUT_SAME_BLOCK_SHADOW
@@ -115,6 +121,8 @@ class SB3Loader extends Loader {
                         case 10: { // TEXT_PRIMITIVE
                             let block = new Block();
                             block.opcode = '%';
+                            block.parent = data.opcode;
+                            block.childCount = 0;
                             block.data = input[1][1];
                             tree.addChild(cur, block);
                             break;
@@ -122,6 +130,8 @@ class SB3Loader extends Loader {
                         case 11: { // BROADCAST_PRIMITIVE
                             let block = new Block();
                             block.opcode = '%';
+                            block.parent = data.opcode;
+                            block.childCount = 0;
                             block.data = input[1][2];
                             tree.addChild(cur, block);
                             break;
@@ -135,8 +145,12 @@ class SB3Loader extends Loader {
                             else {
                                 out.opcode = 'data_listcontents';
                             }
+                            out.parent = data.opcode;
+                            out.childCount = 1;
                             let inn = new Block();
                             inn.opcode = '%';
+                            inn.parent = out.opcode;
+                            inn.childCount = 0;
                             inn.data = input[1][2];
                             tree.addChild(tree.addChild(cur, out), inn);
                             break;
@@ -156,14 +170,8 @@ class SB3Loader extends Loader {
                 }
             }
 
-            // load fields
-            /*let inputs = block.inputs;
-            for (let inputId in inputs) {
-                console.log(inputId); // DEBUG
-                this.loadBlock(blocks, tree, inputId, parent);
-            }*/
-
             blockId = block.next;
+            tree.data[cur].childCount = data.childCount;
         }
     }
 }

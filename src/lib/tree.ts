@@ -2,7 +2,7 @@ import Graph, { Edge } from './graph';
 
 class Tree<T> extends Graph<number> {
     protected nodeNext: number;
-    protected data: T[];
+    public data: T[];
 
     constructor() {
         super();

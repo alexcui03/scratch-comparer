@@ -6,7 +6,8 @@
   "author": "Alex Cui",
   "license": "AGPL-3.0",
   "scripts": {
-    "start": "ts-node src/cli.ts"
+    "start": "ts-node src/cli.ts",
+    "test": "ts-node src/test.ts"
   },
   "bin": {
     "sc-comp": "ts-node src/cli.ts"
